@@ -8,7 +8,7 @@
 
 int main()
 {
-	StringsData data("./data/test3.dat", new SolvingStrategyCPU_Naive());
+	StringsData data("./data/test3.dat", new SolvingStrategyCPU_Trie());
 	/*data.sort_data();
 	data.transpose_data();
 	data.print_data();*/

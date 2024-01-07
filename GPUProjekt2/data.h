@@ -8,9 +8,11 @@ class StringsData
 public:
 	bool transposed;
 	unsigned char* data;
+	unsigned long long* data_as_uint64;
 	int n;
 	int l;
 	int* indicies;
+	
 	int arr_l;
 	std::vector<std::pair<int, int>> solution;
 	std::unique_ptr<SolvingStrategy> s;
@@ -22,6 +24,7 @@ public:
 	StringsData(const StringsData& other) = delete;
 	void solve() { s.get()->solve(*this); }
 	void transpose_data();
+	void reinterpret_as_uint64();
 	void sort_data();
 	void print_data();
 	void printSolution(const char* filename = NULL);

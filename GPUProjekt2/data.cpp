@@ -161,3 +161,18 @@ StringsData::~StringsData()
 	delete[] data;
 	delete[] indicies;
 }
+
+void StringsData::reinterpret_as_uint64()
+{
+
+	int new_arrl = (int)(std::ceil((double)this->l / 64));
+	data_as_uint64 = new unsigned long long[n * new_arrl];
+	memset(data_as_uint64, 0, n * new_arrl * sizeof(unsigned long long));
+	for (int i = 0; i < n; i++)
+	{
+		memcpy(data_as_uint64 + i * new_arrl, data + i * arr_l, arr_l);
+
+	}
+	arr_l = new_arrl; 
+	
+}

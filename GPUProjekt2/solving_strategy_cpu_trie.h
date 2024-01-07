@@ -1,6 +1,7 @@
 #pragma once
 #include "solving_strategy.h"
 #include <cstring>
+#include <vector>
 
 
 class TrieNode
@@ -19,6 +20,7 @@ class HammingRTrie
 	int arr_l, n;
 public:
 	TrieNode** N;
+	std::vector<std::vector<int>> child_ref;
 	HammingRTrie(unsigned char* data, int n, int arr_l);
 	int search(unsigned char* value);
 	~HammingRTrie();
