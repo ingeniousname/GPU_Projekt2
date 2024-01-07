@@ -82,14 +82,16 @@
   <ItemGroup>
     <ClCompile Include="data.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="solving_strategy_cpu.cpp" />
+    <ClCompile Include="solving_strategy_cpu_naive.cpp" />
+    <ClCompile Include="solving_strategy_cpu_trie.cpp" />
     <ClCompile Include="Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cudaError.h" />
     <ClInclude Include="data.h" />
     <ClInclude Include="solving_strategy.h" />
-    <ClInclude Include="solving_strategy_cpu.h" />
+    <ClInclude Include="solving_strategy_cpu_naive.h" />
+    <ClInclude Include="solving_strategy_cpu_trie.h" />
     <ClInclude Include="Timer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

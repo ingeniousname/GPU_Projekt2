@@ -5,11 +5,15 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="solving_strategy_cpu.cpp">
+    <ClCompile Include="solving_strategy_cpu_naive.cpp">
       <Filter>Solving Strategy\CPU</Filter>
     </ClCompile>
     <ClCompile Include="Timer.cpp">
       <Filter>Time</Filter>
+    </ClCompile>
+    <ClCompile Include="data.cpp" />
+    <ClCompile Include="solving_strategy_cpu_trie.cpp">
+      <Filter>Solving Strategy\CPU</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -30,7 +34,7 @@
     <ClInclude Include="solving_strategy.h">
       <Filter>Solving Strategy</Filter>
     </ClInclude>
-    <ClInclude Include="solving_strategy_cpu.h">
+    <ClInclude Include="solving_strategy_cpu_naive.h">
       <Filter>Solving Strategy\CPU</Filter>
     </ClInclude>
     <ClInclude Include="Timer.h">
@@ -38,6 +42,10 @@
     </ClInclude>
     <ClInclude Include="cudaError.h">
       <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="data.h" />
+    <ClInclude Include="solving_strategy_cpu_trie.h">
+      <Filter>Solving Strategy\CPU</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
