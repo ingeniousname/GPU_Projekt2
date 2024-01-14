@@ -1,5 +1,6 @@
 #include "solving_strategy_cpu_naive.h"
 #include "data.h"
+#include <algorithm>
 #include <bit>
 
 bool SolvingStrategyCPU_Naive::hamming_dist_eq_to_one(StringsData& data, int i, int j)
@@ -14,13 +15,24 @@ bool SolvingStrategyCPU_Naive::hamming_dist_eq_to_one(StringsData& data, int i, 
 
 void SolvingStrategyCPU_Naive::solve(StringsData& data)
 {
-
+	data.sort_data();
+	data.set_next_idx();
 	data.reinterpret_as_uint64();
-	for (int i = 0; i < data.n; i++)
+	for (int i = 0; i < data.n; i = data.next_idx[i])
 	{
-		for(int j = i + 1; j < data.n; j++)
-			if(this->hamming_dist_eq_to_one(data, i, j))
-				data.solution.push_back(std::make_pair(i, j));
+		for(int j = i + 1; j < data.n; j  = data.next_idx[j])
+			if (this->hamming_dist_eq_to_one(data, i, j))
+			{
+				data.num_solutions += (data.next_idx[i] - i) * (data.next_idx[j] - j);
+				if (verbose)
+				{
+					for (int n1 = i; n1 < data.next_idx[i]; n1++)
+						for (int n2 = j; n2 < data.next_idx[j]; n2++)
+							if (data.indicies[n1] < data.indicies[n2])
+								data.solution.push_back(std::make_pair(data.indicies[n1], data.indicies[n2]));
+							else data.solution.push_back(std::make_pair(data.indicies[n2], data.indicies[n1]));
+				}
+			}
 	}
-
+	std::sort(data.solution.begin(), data.solution.end());
 }

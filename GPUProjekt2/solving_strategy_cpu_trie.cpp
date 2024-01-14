@@ -4,8 +4,9 @@
 #include <algorithm>
 #include <fstream>
 #include <set>
+#include <iostream>
 
-HammingRTrie::HammingRTrie(unsigned char* data, int n, int arr_l)
+HammingRTrie_CPU::HammingRTrie_CPU(unsigned char* data, int n, int arr_l)
 {
 	this->arr_l = arr_l;
 	this->n = n;
@@ -31,6 +32,12 @@ HammingRTrie::HammingRTrie(unsigned char* data, int n, int arr_l)
 
 	}
 
+	/*for (int i = 0; i < arr_l; i++)
+	{
+		for (int j = 0; j < n; j++)
+			std::cout << S[i * n + j] << " ";
+		std::cout << "\n";
+	}*/
 	N = new TrieNode*[arr_l];
 	for (int x = 0; x < arr_l - 1; x++)
 	{
@@ -46,17 +53,14 @@ HammingRTrie::HammingRTrie(unsigned char* data, int n, int arr_l)
 	for (int i = 0; i < n; i++)
 	{
 		if (N[x][S[n * x + i] - 1].children[data[n * x + i]] == 0)
-			N[x][S[n * x + i] - 1].children[data[n * x + i]] = ++count;
+			N[x][S[n * x + i] - 1].children[data[n * x + i]] = i + 1;
 	}
-	child_ref = std::vector<std::vector<int>>(count, std::vector<int>());
 
-	for (int i = 0; i < n; i++)
-		child_ref[N[x][S[n * x + i] - 1].children[data[n * x + i]] - 1].push_back(i);
 
 
 }
 
-int HammingRTrie::search(unsigned char* value)
+int HammingRTrie_CPU::search(unsigned char* value)
 {
 	int pos = 1;
 	for (int level = 0; level < arr_l; level++)
@@ -67,16 +71,11 @@ int HammingRTrie::search(unsigned char* value)
 	return pos - 1;
 }
 
-HammingRTrie::~HammingRTrie()
+HammingRTrie_CPU::~HammingRTrie_CPU()
 {
 	for (int i = 0; i < arr_l; i++)
 		delete[] N[i];
 	delete[] N;
-}
-
-bool SolvingStrategyCPU_Trie::hamming_dist_eq_to_one(StringsData& data, int i, int j)
-{
-	return false;
 }
 
 void SolvingStrategyCPU_Trie::solve(StringsData& data)
@@ -86,41 +85,36 @@ void SolvingStrategyCPU_Trie::solve(StringsData& data)
 		inputs.insert(i);
 
 	data.sort_data();
+	data.set_next_idx();
 	data.transpose_data();
 
-	HammingRTrie trie(data.data, data.n, data.arr_l);
+	HammingRTrie_CPU trie(data.data, data.n, data.arr_l);
 	unsigned char* v = new unsigned char[data.arr_l];
 
-	while(!inputs.empty())
+	for(int i = 0; i < data.n; i = data.next_idx[i])
 	{
-		int i = *inputs.begin();
 		for (int j = 0; j < data.arr_l; j++)
 			v[j] = data.data[j * data.n + i];
-
-		int idx1 = trie.search(v);
 
 		for (int pos = 0; pos < data.l; pos++)
 		{
 			v[pos / 8] ^= (1 << (pos % 8));
 			int res = trie.search(v);
-			if (res >= 0)
+			if (res >= 0 && i < res)
 			{
-				if (idx1 < res)
+				data.num_solutions += (data.next_idx[i] - i) * (data.next_idx[res] - res);
+				if (verbose)
 				{
-					for(int n1 : trie.child_ref[idx1])
-						for (int n2 : trie.child_ref[res])
-						{
+					for (int n1 = i; n1 < data.next_idx[i]; n1++)
+						for (int n2 = res; n2 < data.next_idx[res]; n2++)
 							if (data.indicies[n1] < data.indicies[n2])
 								data.solution.push_back(std::make_pair(data.indicies[n1], data.indicies[n2]));
 							else data.solution.push_back(std::make_pair(data.indicies[n2], data.indicies[n1]));
-						}
 				}
+					
 			}
 			v[pos / 8] ^= (1 << (pos % 8));
-
 		}
-		for (int n1 : trie.child_ref[idx1])
-			inputs.erase(n1);
 
 	}
 

@@ -80,6 +80,8 @@ StringsData::StringsData(const char* filename, SolvingStrategy* s) : s(s), trans
 	indicies = new int[n];
 	for(int i = 0; i < n; i++)
 		indicies[i] = i;
+
+	this->num_solutions = 0;
 }
 
 void StringsData::transpose_data()
@@ -110,10 +112,48 @@ void StringsData::printSolution(const char* filename)
 	else
 	{
 		std::ofstream f(filename, std::ios::out);
+		f << num_solutions << "\n";
 		for (auto& sol : this->solution)
 			f << "(" << sol.first << ", " << sol.second << ")\n";
 		f.close();
 	}
+}
+
+void StringsData::set_next_idx()
+{
+	next_idx = new int[this->n];
+	int i = 0, j = 1;
+	while (j < this->n)
+	{
+		if (cmp_sequences(i, j))
+			j++;
+		else
+		{
+			next_idx[i] = j;
+			i = j;
+			j = i + 1;
+		}
+	}
+	next_idx[i] = j;
+}
+
+bool StringsData::cmp_sequences(int i, int j)
+{
+	for (int k = 0; k < arr_l; k++)
+	{
+		if (transposed)
+		{
+			if (data[k * n + i] != data[k * n + j])
+				return false;
+		}
+		else
+		{
+			if (data[i * arr_l + k] != data[j * arr_l + k])
+				return false;
+		}
+
+	}
+	return true;
 }
 
 void StringsData::print_data()

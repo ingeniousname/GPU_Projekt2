@@ -1,34 +1,24 @@
 #pragma once
 #include "solving_strategy.h"
+#include "trie_node.h"
 #include <cstring>
 #include <vector>
 
 
-class TrieNode
-{
-public:
-	int children[256];
-	TrieNode()
-	{
-		memset(children, 0, 256 * sizeof(int));
-	}
 
-};
-
-class HammingRTrie
+class HammingRTrie_CPU
 {
 	int arr_l, n;
 public:
 	TrieNode** N;
-	std::vector<std::vector<int>> child_ref;
-	HammingRTrie(unsigned char* data, int n, int arr_l);
+	HammingRTrie_CPU(unsigned char* data, int n, int arr_l);
 	int search(unsigned char* value);
-	~HammingRTrie();
+	~HammingRTrie_CPU();
 };
 
 class SolvingStrategyCPU_Trie : public SolvingStrategy
 {
-	bool hamming_dist_eq_to_one(StringsData& data, int i, int j);
 public:
+	SolvingStrategyCPU_Trie(bool v) : SolvingStrategy(v) {}
 	virtual void solve(StringsData& data);
 };

@@ -2,6 +2,9 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <CudaCompile Include="kernel.cu" />
+    <CudaCompile Include="solving_strategy_gpu.cu">
+      <Filter>Solving Strategy\GPU</Filter>
+    </CudaCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -29,6 +32,9 @@
     <Filter Include="Utils">
       <UniqueIdentifier>{31b68f59-53c1-4516-95ad-fbf524e2f5ce}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Solving Strategy\GPU">
+      <UniqueIdentifier>{24040ec1-7bd9-435d-a765-93a78aecad82}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="solving_strategy.h">
@@ -46,6 +52,12 @@
     <ClInclude Include="data.h" />
     <ClInclude Include="solving_strategy_cpu_trie.h">
       <Filter>Solving Strategy\CPU</Filter>
+    </ClInclude>
+    <ClInclude Include="solving_strategy_gpu.cuh">
+      <Filter>Solving Strategy\GPU</Filter>
+    </ClInclude>
+    <ClInclude Include="trie_node.h">
+      <Filter>Solving Strategy</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

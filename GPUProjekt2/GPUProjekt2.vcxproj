@@ -13,6 +13,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{2E24E4AE-8158-4F89-8806-D2ED3DE769BC}</ProjectGuid>
     <RootNamespace>GPUProjekt2</RootNamespace>
+    <ProjectName>HammingOne</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -78,6 +79,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <CudaCompile Include="kernel.cu" />
+    <CudaCompile Include="solving_strategy_gpu.cu" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="data.cpp" />
@@ -92,7 +94,9 @@
     <ClInclude Include="solving_strategy.h" />
     <ClInclude Include="solving_strategy_cpu_naive.h" />
     <ClInclude Include="solving_strategy_cpu_trie.h" />
+    <ClInclude Include="solving_strategy_gpu.cuh" />
     <ClInclude Include="Timer.h" />
+    <ClInclude Include="trie_node.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
