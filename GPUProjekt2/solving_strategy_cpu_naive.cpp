@@ -20,10 +20,10 @@ void SolvingStrategyCPU_Naive::solve(StringsData& data)
 	data.reinterpret_as_uint64();
 	for (int i = 0; i < data.n; i = data.next_idx[i])
 	{
-		for(int j = i + 1; j < data.n; j  = data.next_idx[j])
+		for(int j = data.next_idx[i]; j < data.n; j = data.next_idx[j])
 			if (this->hamming_dist_eq_to_one(data, i, j))
 			{
-				data.num_solutions += (data.next_idx[i] - i) * (data.next_idx[j] - j);
+				data.num_solutions += (unsigned long long)(data.next_idx[i] - i) * (data.next_idx[j] - j);
 				if (verbose)
 				{
 					for (int n1 = i; n1 < data.next_idx[i]; n1++)

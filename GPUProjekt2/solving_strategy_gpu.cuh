@@ -3,9 +3,9 @@
 #include "trie_node.h"
 #include <thrust/device_vector.h>
 
-__global__ void createTreeKernel(int* tree, int* S, unsigned char* data, int* dev_begin, int n, int arr_l);
-__global__ void searchTree(int* tree, unsigned char* data, int* dev_begin, int* result, int n, int arr_l, int l);
-__device__ int search(int* tree, unsigned char* value, int* dev_begin, int arr_l);
+__global__ void createTreeKernel(unsigned int* tree, int* S, unsigned char* data, int* dev_begin, int n, int arr_l);
+__global__ void searchTree(unsigned int* tree, unsigned char* data, int* dev_begin, int* result, int n, int arr_l, int l);
+__device__ int search(unsigned int* tree, unsigned char* value, int* dev_begin, int arr_l);
 
 struct NotEqualsFunctor {
 	template <typename T>
@@ -21,7 +21,7 @@ class HammingRTrie_GPU
 	int* dev_begin;
 	thrust::device_vector<unsigned char> V;
 public:
-	int* N;
+	unsigned int* N;
 	HammingRTrie_GPU(unsigned char* data, int n, int arr_l, int l);
 	int* searchAll();
 	~HammingRTrie_GPU();

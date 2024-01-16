@@ -13,7 +13,7 @@ public:
 	int n;
 	int l;
 	int* indicies;
-	int num_solutions;
+	unsigned long long num_solutions;
 	
 	int arr_l;
 	std::vector<std::pair<int, int>> solution;
@@ -29,7 +29,6 @@ public:
 	void transpose_data();
 	void reinterpret_as_uint64();
 	void sort_data();
-	void print_data();
 	void set_next_idx();
 	bool cmp_sequences(int i, int j);
 	void printSolution(const char* filename = NULL);

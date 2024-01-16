@@ -72,11 +72,6 @@ StringsData::StringsData(const char* filename, SolvingStrategy* s) : s(s), trans
 	}
 	f.close();
 
-	//niepotrzebne
-	/*for (int i = 0; i < n * arr_l; i++)
-	{
-	 	data[i] = reverse_bits(data[i]);
-	}*/
 	indicies = new int[n];
 	for(int i = 0; i < n; i++)
 		indicies[i] = i;
@@ -154,46 +149,6 @@ bool StringsData::cmp_sequences(int i, int j)
 
 	}
 	return true;
-}
-
-void StringsData::print_data()
-{
-	if (transposed)
-	{
-		for (int i = 0; i < n; i++)
-		{
-			for (int j = 0; j < arr_l; j++)
-			{
-				int mask = 0x80;
-				for (int bit = 7; bit >= 0; bit--)
-				{
-					printf("%d", (data[i + j * n] & mask) >> bit);
-					mask >>= 1;
-				}
-				printf("\'");
-			}
-			printf(" - %d\n", indicies[i]);
-		}
-	}
-	else
-	{
-		for (int i = 0; i < n; i++)
-		{
-			for (int j = 0; j < arr_l; j++)
-			{
-				int mask = 0x80;
-				for (int bit = 7; bit >= 0; bit--)
-				{
-					printf("%d", (data[indicies[i] * arr_l + j] & mask) >> bit);
-					mask >>= 1;
-				}
-				printf("\'");
-			}
-			printf("\n");
-		}
-	}
-
-
 }
 
 StringsData::~StringsData()

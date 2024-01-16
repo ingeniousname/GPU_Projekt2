@@ -102,7 +102,7 @@ void SolvingStrategyCPU_Trie::solve(StringsData& data)
 			int res = trie.search(v);
 			if (res >= 0 && i < res)
 			{
-				data.num_solutions += (data.next_idx[i] - i) * (data.next_idx[res] - res);
+				data.num_solutions += (unsigned long long)(data.next_idx[i] - i) * (data.next_idx[res] - res);
 				if (verbose)
 				{
 					for (int n1 = i; n1 < data.next_idx[i]; n1++)
