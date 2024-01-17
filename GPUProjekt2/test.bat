@@ -1,3 +1,3 @@
-XCOPY .\..\x64\Debug\HammingOne.exe .
-compute-sanitizer --tool memcheck ./HammingOne.exe ./data/test3.dat ./solution.txt 2 -v
+XCOPY .\..\x64\Release\HammingOne.exe .
+compute-sanitizer --tool memcheck ./HammingOne.exe ./data/data_200k.dat ./solution.txt 2 -v
 PAUSE

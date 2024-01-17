@@ -5,7 +5,8 @@
 #include <cstdio>
 #include "Timer.h"
 
-void StringsData::count_sort(int idx)
+// implementacja sortowania przez zliczanie
+void SequencesData::count_sort(int idx)
 {
 	unsigned char* output = new unsigned char[n * arr_l];
 	int* new_indicies = new int[n];
@@ -31,11 +32,13 @@ void StringsData::count_sort(int idx)
 	delete[] new_indicies;
 }
 
-StringsData::StringsData(const char* filename, SolvingStrategy* s) : s(s), transposed(false)
+
+SequencesData::SequencesData(const char* filename, SolvingStrategy* s) : s(s), transposed(false)
 {
 	Timer_CPU t("Data reading", true);
 	size_t typesize = sizeof(unsigned char) * 8;
 
+	// odczytywanie ci¹gów z pliku
 	std::ifstream f(filename, std::ios::in);
 	if (f.is_open())
 	{
@@ -72,6 +75,7 @@ StringsData::StringsData(const char* filename, SolvingStrategy* s) : s(s), trans
 	}
 	f.close();
 
+	// ustanowienie indeksów ci¹gów, bêd¹ siê one zmienia³y podczas sortowania
 	indicies = new int[n];
 	for(int i = 0; i < n; i++)
 		indicies[i] = i;
@@ -79,7 +83,8 @@ StringsData::StringsData(const char* filename, SolvingStrategy* s) : s(s), trans
 	this->num_solutions = 0;
 }
 
-void StringsData::transpose_data()
+// funkcja transponuj¹ca dane (zamiana z AoS na SoA)
+void SequencesData::transpose_data()
 {
 	transposed = !transposed;
 	unsigned char* transposed_data = new unsigned char[n * arr_l];
@@ -91,13 +96,15 @@ void StringsData::transpose_data()
 
 }
 
-void StringsData::sort_data()
+// funkcja sortuj¹ca dane
+void SequencesData::sort_data()
 {
 	for (int i = arr_l - 1; i >= 0; i--)
 		count_sort(i);
 }
 
-void StringsData::printSolution(const char* filename)
+// funkcja wypisuj¹ca dane do pliku
+void SequencesData::printSolution(const char* filename)
 {
 	if (filename == NULL)
 	{
@@ -114,9 +121,11 @@ void StringsData::printSolution(const char* filename)
 	}
 }
 
-void StringsData::set_next_idx()
+// funkcja, która wywo³ana po sortowaniu odpowiednio przypisuje indeksy do tablic next_idx oraz start_of_idx tak, ¿e duplikaty ci¹gów s¹ traktowane równowa¿nie
+void SequencesData::set_next_idx()
 {
 	next_idx = new int[this->n];
+	start_of_idx = new int[this->n];
 	int i = 0, j = 1;
 	while (j < this->n)
 	{
@@ -125,14 +134,21 @@ void StringsData::set_next_idx()
 		else
 		{
 			next_idx[i] = j;
+			int start = i;
+			for (i; i < j; i++)
+				start_of_idx[i] = start;
 			i = j;
 			j = i + 1;
 		}
 	}
 	next_idx[i] = j;
+	int start = i;
+	for (i; i < j; i++)
+		start_of_idx[i] = start;
 }
 
-bool StringsData::cmp_sequences(int i, int j)
+// funkcja porónuj¹ca dwa ci¹gi
+bool SequencesData::cmp_sequences(int i, int j)
 {
 	for (int k = 0; k < arr_l; k++)
 	{
@@ -151,13 +167,16 @@ bool StringsData::cmp_sequences(int i, int j)
 	return true;
 }
 
-StringsData::~StringsData()
+SequencesData::~SequencesData()
 {
 	delete[] data;
 	delete[] indicies;
+	delete[] next_idx;
+	delete[] start_of_idx;
 }
 
-void StringsData::reinterpret_as_uint64()
+// funkcja pozwalaj¹ca przepisaæ dane do tablicy typu unsigned long long - przydatne w przypadku algorytmu naiwnego
+void SequencesData::reinterpret_as_uint64()
 {
 
 	int new_arrl = (int)(std::ceil((double)this->l / 64));

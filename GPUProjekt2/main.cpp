@@ -18,6 +18,8 @@ int main(int argc, char* argv[])
 	const int mode = atoi(argv[3]);
 	bool verbose = (argc == 5);
 	SolvingStrategy* s;
+
+	// wybór strategii
 	switch (mode)
 	{
 		case 0: s = new SolvingStrategyCPU_Naive(verbose); break;
@@ -34,14 +36,13 @@ int main(int argc, char* argv[])
 
 
 
-	StringsData data(argv[1], s);
+	SequencesData data(argv[1], s);
 	{
 		Timer_CPU t("Solving", true);
+		// wykonanie odpowiedniej strategii
 		data.solve();
-	
 	}
 	{
-	
 		Timer_CPU t("Output printing", true);
 		data.printSolution(argv[2]);
 	}

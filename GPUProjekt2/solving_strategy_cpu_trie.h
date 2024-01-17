@@ -20,5 +20,5 @@ class SolvingStrategyCPU_Trie : public SolvingStrategy
 {
 public:
 	SolvingStrategyCPU_Trie(bool v) : SolvingStrategy(v) {}
-	virtual void solve(StringsData& data);
+	virtual void solve(SequencesData& data);
 };

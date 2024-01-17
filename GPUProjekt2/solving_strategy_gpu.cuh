@@ -4,7 +4,7 @@
 #include <thrust/device_vector.h>
 
 __global__ void createTreeKernel(unsigned int* tree, int* S, unsigned char* data, int* dev_begin, int n, int arr_l);
-__global__ void searchTree(unsigned int* tree, unsigned char* data, int* dev_begin, int* result, int n, int arr_l, int l);
+__global__ void searchTreeKernel(unsigned int* tree, unsigned char* data, int* dev_begin, int* result, int n, int arr_l, int l);
 __device__ int search(unsigned int* tree, unsigned char* value, int* dev_begin, int arr_l);
 
 struct NotEqualsFunctor {
@@ -32,6 +32,6 @@ class SolvingStrategy_GPU : public SolvingStrategy
 {
 public:
 	SolvingStrategy_GPU(bool v) : SolvingStrategy(v) {}
-	virtual void solve(StringsData& data);
+	virtual void solve(SequencesData& data);
 };
 			

@@ -11,38 +11,49 @@
 #include "device_launch_parameters.h"
 #include <algorithm>
 
+// kernel odpowiedzialny za budowê drzewa
 __global__ void createTreeKernel(unsigned int* N, int* S, unsigned char* data, int* begin, int n, int arr_l)
 {
 	int idx = threadIdx.x + blockDim.x * blockIdx.x;
 	if (idx < n)
 	{
+		// przypisanie dzieci do rodziców w drzewie
 		for (int x = 0; x < arr_l - 1; x++)
 		{
 			N[(begin[x] + S[n * x + idx] - 1) * 256 + data[n * x + idx]] = S[n * (x + 1) + idx];
 		}
+
+		// przypisanie liœci w drzewie
 		N[(begin[arr_l - 1] + S[n * (arr_l - 1) + idx] - 1) * 256 + data[n * (arr_l - 1) + idx]] = idx + 1;
 	}
 }
 
-__global__ void searchTree(unsigned int* N, unsigned char* data, int* begin, int* result, int n, int arr_l, int l)
+__global__ void searchTreeKernel(unsigned int* N, unsigned char* data, int* begin, int* result, int n, int arr_l, int l)
 {
 	int idx = threadIdx.x + blockDim.x * blockIdx.x;
 	if (idx < n)
 	{
+		// alokacja pamiêci na idx-ty ci¹g
 		unsigned char* sequence = new unsigned char[arr_l];
+
+		// przepisanie ci¹gu do pamiêci lokalnej
 		for (int i = 0; i < arr_l; i++)
 			sequence[i] = data[i * n + idx];
 
 		for (int pos = 0; pos < l; pos++)
 		{
-			sequence[pos / 8] ^= (1 << (pos % 8));
+			// modyfikacja ci¹gu na pos-tej pozycji
+			sequence[pos >> 3] ^= (1 << (pos & 7));
+
+			// przeszukiwanie drzewa i wypisanie odpowiedzi
 			result[pos * n + idx] = search(N, sequence, begin, arr_l);
-			sequence[pos / 8] ^= (1 << (pos % 8));
+
+			// powrotna modyfikacja
+			sequence[pos >> 3] ^= (1 << (pos & 7));
 		}
 
 
 		delete[] sequence;
-
 	}
 }
 
@@ -51,28 +62,37 @@ __device__ int search(unsigned int* N, unsigned char* value, int* begin, int arr
 	int pos = 1;
 	for (int level = 0; level < arr_l; level++)
 	{
-		pos = N[(begin[level] + pos - 1) * 256 + value[level]];
-		if (pos == 0) return -1;
+		pos = N[((begin[level] + pos - 1) << 8) + value[level]];
+		// dopóki nie natrafimy na wartoœæ 0 - idziemy po istniej¹cej œcie¿ce w drzewie
+		if (pos == 0) break;
 	}
 	return pos - 1;
 }
 
 
-void SolvingStrategy_GPU::solve(StringsData& data)
+void SolvingStrategy_GPU::solve(SequencesData& data)
 {
+	// preprocessing
 	data.sort_data();
 	data.set_next_idx();
 	data.transpose_data();
+	
+	// inicjalizacja drzewa
 	HammingRTrie_GPU trie(data.data, data.n, data.arr_l, data.l);
+
+	// przeszukiwanie drzewa
 	int* res = trie.searchAll();
 
+
+	// przeszukiwanie odpowiedzi - dla ka¿dego ci¹gu i dla ka¿dej pozycji sprawdzamy, czy nie otrzymaliœmy dopasowania
 	for (int i = 0; i < data.l; i++)
 	{
 		for (int j = 0; j < data.n; j = data.next_idx[j])
 		{
 			if (res[i * data.n + j] >= 0 && res[i * data.n + j] > j)
 			{
-				int other = res[i * data.n + j];
+				// w tej linii upewniamy siê, ¿e wybieramy pierwszy indeks dla tego ci¹gu (je¿eli takich ci¹gów jest wiêcej w danych wejœciowych)
+				int other = data.start_of_idx[res[i * data.n + j]];
 				data.num_solutions += (unsigned long long)(data.next_idx[j] - j) * (data.next_idx[other] - other);
 				if (verbose)
 				{
@@ -85,6 +105,7 @@ void SolvingStrategy_GPU::solve(StringsData& data)
 			}
 		}
 	}
+
 	std::sort(data.solution.begin(), data.solution.end());
 	delete[] res;
 }
@@ -97,8 +118,10 @@ HammingRTrie_GPU::HammingRTrie_GPU(unsigned char* data, int n, int arr_l, int l)
 
 	CALL(cudaSetDevice(0));
 	V = thrust::device_vector<unsigned char>(data, data + n * arr_l);
-	thrust::device_vector<int>S = thrust::device_vector<int>(n * arr_l, 0);
+	thrust::device_vector<int> S = thrust::device_vector<int>(n * arr_l, 0);
 
+
+	// obliczamy F_0, ..., F_{arr_l - 1}
 	S[0] = 1;
 	for (int i = 1; i < arr_l; i++)
 	{
@@ -116,6 +139,7 @@ HammingRTrie_GPU::HammingRTrie_GPU(unsigned char* data, int n, int arr_l, int l)
 			thrust::logical_or<int>());
 	}
 	
+	// obliczamy S_0, ..., S_{arr_l - 1}
 	for (int i = 0; i < arr_l; i++)
 	{
 		thrust::inclusive_scan(
@@ -124,6 +148,7 @@ HammingRTrie_GPU::HammingRTrie_GPU(unsigned char* data, int n, int arr_l, int l)
 			S.begin() + i * n);
 	}
 
+	// obliczamy iloœæ wêz³ów w drzewie oraz indeks pocz¹tku ka¿dego z poziomów drzewa
 	int* begin = new int[arr_l];
 	total_nodes = 0;
 	for (int i = 0; i < arr_l; i++)
@@ -131,63 +156,43 @@ HammingRTrie_GPU::HammingRTrie_GPU(unsigned char* data, int n, int arr_l, int l)
 		begin[i] = total_nodes;
 		total_nodes += S[(i + 1) * n - 1];
 	}
+
+	// inicjowanie pamiêci dla drzewa
 	CALL(cudaMalloc((void**)&this->dev_begin, sizeof(int) * arr_l));
 	CALL(cudaMemcpy(dev_begin, begin, sizeof(int) * arr_l, cudaMemcpyHostToDevice));
+
 	CALL(cudaMalloc((void**)&this->N, total_nodes * 256 * sizeof(unsigned int)));
 	CALL(cudaMemset(this->N, 0, total_nodes * 256 * sizeof(unsigned int)));
-	//CALL(cudaMemset(this->N + 256 * begin[this->arr_l - 1], 255, total_nodes - begin[this->arr_l - 1]));
 
 	delete[] begin;
 
-
 	int blockSize = 256;
 	int numBlocks = (n + blockSize - 1) / blockSize;
-	
 
-
+	// budowanie drzewa
 	createTreeKernel<<<numBlocks, blockSize>>>(N, (int*)thrust::raw_pointer_cast(S.data()), (unsigned char*)thrust::raw_pointer_cast(V.data()), dev_begin, n, arr_l);
 	
 	CALL(cudaGetLastError());
 	CALL(cudaDeviceSynchronize());
 
-	//N = new TrieNode*[arr_l];
-	//for (int x = 0; x < arr_l - 1; x++)
-	//{
-	//	N[x] = new TrieNode[S[(x + 1) * n - 1]];
-	//	for (int i = 0; i < n; i++)
-	//	{
-	//		N[x][S[n * x + i] - 1].children[data[n * x + i]] = S[n * (x + 1) + i];
-	//	}
-	//}
-	//int count = 0;
-	//int x = arr_l - 1;
-	//N[x] = new TrieNode[S[(x + 1) * n - 1]];
-	//for (int i = 0; i < n; i++)
-	//{
-	//	if (N[x][S[n * x + i] - 1].children[data[n * x + i]] == 0)
-	//		N[x][S[n * x + i] - 1].children[data[n * x + i]] = ++count;
-	//}
-	//child_ref = std::vector<std::vector<int>>(count, std::vector<int>());
-
-	//for (int i = 0; i < n; i++)
-	//	child_ref[N[x][S[n * x + i] - 1].children[data[n * x + i]] - 1].push_back(i);
-
-
 }
 int* HammingRTrie_GPU::searchAll()
 {
+	// inicjowanie tablicy odpowiedzi
 	int* result, *dev_result;
 	result = new int[n * l];
 	cudaMalloc((void**)&dev_result, sizeof(int) * n * l);
 	cudaMemset(dev_result, 0, sizeof(int) * n * l);
 
-	int blockSize = 256;
+	int blockSize = 64;
 	int numBlocks = (n + blockSize - 1) / blockSize;
 
-	searchTree << <numBlocks, blockSize >> > (N, (unsigned char*)thrust::raw_pointer_cast(V.data()), dev_begin, dev_result, n, arr_l, l);
+	// poszukiwanie w drzewie
+	searchTreeKernel << <numBlocks, blockSize >> > (N, (unsigned char*)thrust::raw_pointer_cast(V.data()), dev_begin, dev_result, n, arr_l, l);
 	CALL(cudaGetLastError());
 	CALL(cudaDeviceSynchronize());
 
+	// przekopiowanie odpowiedzi na CPU
 	CALL(cudaMemcpy(result, dev_result, sizeof(int) * n * l, cudaMemcpyDeviceToHost));
 	CALL(cudaFree(dev_result));
 
