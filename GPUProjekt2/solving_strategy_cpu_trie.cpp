@@ -99,7 +99,7 @@ void SolvingStrategyCPU_Trie::solve(SequencesData& data)
 		for (int pos = 0; pos < data.l; pos++)
 		{
 			// modyfikacja ci¹gu na l-tym bicie
-			v[pos << 3] ^= (1 << (pos & 7));
+			v[pos >> 3] ^= (1 << (pos & 7));
 
 			// przeszukiwanie drzewa
 			int res = trie.search(v);
@@ -107,6 +107,7 @@ void SolvingStrategyCPU_Trie::solve(SequencesData& data)
 			// znalezienie odpowiedzi, upewniamy siê, ¿e siê nie powtarzamy
 			if (res >= 0 && i < res)
 			{
+				//res = data.start_of_idx[res];
 				data.num_solutions += (unsigned long long)(data.next_idx[i] - i) * (data.next_idx[res] - res);
 				if (verbose)
 				{
@@ -119,7 +120,7 @@ void SolvingStrategyCPU_Trie::solve(SequencesData& data)
 					
 			}
 			// modyfikacja powrotna
-			v[pos << 3] ^= (1 << (pos & 7));
+			v[pos >> 3] ^= (1 << (pos & 7));
 		}
 
 	}
