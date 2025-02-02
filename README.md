@@ -16,6 +16,6 @@ There are three calculation strategies to choose from:
 - Trie implementation on CPU
 - Trie implementation on GPU
 
-While the naive implementation solves the problem in $O(n^2l)$, the program implements a radix search tree structure for binary keys based on [this paper](https://onlinelibrary-1wiley-1com-10000956e0040.eczyt.bg.pw.edu.pl/doi/full/10.1002/cpe.5027). A trie is initialized with all of the strings in $O(nl)$ time. Then, for each of the strings and each of the indicies i = $0, 1, ..., l - 1$ we can check if the trie contains a string that differs from the currently processed string on position i in $O(l)$. Thus, searching for each of the keys takes $O(nl^2)$ time. The search is further accelerated by parallelizing the search for each bit position for a given string.
+While the naive implementation solves the problem in $O(n^2l)$, the program implements a radix search tree structure for binary keys based on [this paper](https://onlinelibrary-1wiley-1com-10000956e0040.eczyt.bg.pw.edu.pl/doi/full/10.1002/cpe.5027). A trie is initialized with all of the strings in $O(nl)$ time. Then, for each of the strings and each of the indicies i = $0, 1, ..., l - 1$ we can check if the trie contains a string that differs from the currently processed string on position i in $O(l)$. Thus, searching for each of the keys takes $O(nl^2)$ time. The algorithm is further accelerated by parallelizing the search for each bit position for a given string.
 
 Program was implemented using C++/CUDA.
