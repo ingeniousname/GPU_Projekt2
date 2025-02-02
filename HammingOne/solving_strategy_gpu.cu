@@ -3,13 +3,14 @@
 #include <thrust/reduce.h>
 #include <thrust/sort.h>
 #include "cudaError.h"
-#include "cuda_runtime.h"
 #include "thrust/adjacent_difference.h"
 #include "thrust/scan.h"
 #include "thrust/equal.h"
 #include "data.h"
 #include "device_launch_parameters.h"
 #include <algorithm>
+#include <thrust\device_vector.h>
+
 
 // kernel odpowiedzialny za budowê drzewa
 __global__ void createTreeKernel(unsigned int* N, int* S, unsigned char* data, int* begin, int n, int arr_l)

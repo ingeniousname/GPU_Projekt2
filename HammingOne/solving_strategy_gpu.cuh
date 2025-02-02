@@ -1,11 +1,14 @@
 #pragma once
 #include "solving_strategy.h"
 #include "trie_node.h"
-#include <thrust/device_vector.h>
+#include "cuda_runtime.h"
+
+#include <thrust\device_vector.h>
 
 __global__ void createTreeKernel(unsigned int* tree, int* S, unsigned char* data, int* dev_begin, int n, int arr_l);
 __global__ void searchTreeKernel(unsigned int* tree, unsigned char* data, int* dev_begin, int* result, int n, int arr_l, int l);
 __device__ int search(unsigned int* tree, unsigned char* value, int* dev_begin, int arr_l);
+
 
 struct NotEqualsFunctor {
 	template <typename T>

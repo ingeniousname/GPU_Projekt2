@@ -73,6 +73,11 @@ SequencesData::SequencesData(const char* filename, SolvingStrategy* s) : s(s), t
 		}
 		delete[] temp_data_string;
 	}
+	else
+	{
+		std::cout << "Failed to open file: " << filename << "\n";
+		exit(1);
+	}
 	f.close();
 
 	// ustanowienie indeksów ci¹gów, bêd¹ siê one zmienia³y podczas sortowania
